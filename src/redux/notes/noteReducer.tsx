@@ -1,16 +1,30 @@
-import {ADD_NOTE} from './noteTypes'
+import {ADD_NOTE, TOGGLE_MODAL} from './noteTypes'
 
-const initialState = {
-    numOfNotes: 0
+ export interface NotesState{
+    notes: string[],
+    showModal: boolean
 }
 
-const noteReducer = (state = initialState, action:any)  => {
+const initialState = {
+    notes: [""],
+    showModal: false
+}
+
+type Action = {type: string, payload: string}
+
+export const noteReducer = (state:NotesState = initialState, action:Action)  => {
+    
     switch(action.type){
         case ADD_NOTE: return{
             ...state,
-            numOfNotes: state.numOfNotes + 1
+            notes: [...state.notes, action.payload]        
         }
+        case TOGGLE_MODAL: return{
+            ...state,
+            showModal: !state.showModal
+        }
+        default: 
+            return state;
     }
 }
 
-export default noteReducer

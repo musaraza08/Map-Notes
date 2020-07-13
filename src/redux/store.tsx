@@ -1,11 +1,11 @@
 import {createStore} from 'redux'
-import noteReducer from './notes/noteReducer'
+import {noteReducer} from './notes/noteReducer'
 
 const initialState = {
-    numOfNotes: 0
+    notes: [""],
+    showModal: false
 }
 
-
-const store = createStore(noteReducer, initialState)
+const store = createStore(noteReducer)
 
 export default store
