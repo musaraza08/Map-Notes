@@ -3,20 +3,15 @@ import Maps from './Maps';
 import { Provider} from 'react-redux';
 import store from '../redux/store';
 import NotesList from './NotesList';
-import {Button, Grid, Row, Notes, Map, Section, Modal, Title, Description} from './styled'
-
-
+import {Button, Grid, Row,Nav, Notes, Map, Section, Modal, Title, Description, TopNav} from './styled'
 
 function App  (props:any)  {
         return(
-          <Provider store={store}>
-            
+          
+            <>
             <Grid>
-              <Row>
-                <Section>
-                  <h1>Map Notes</h1>
-                </Section>
-              </Row>
+              <Nav>                
+              </Nav>
               <Row>
                 <Notes>
                   <NotesList />
@@ -24,12 +19,7 @@ function App  (props:any)  {
                 <Map><Maps /></Map>
               </Row>
             </Grid>
-            
-            <div>
-            
-            {/*<MapConatiner />*/ }
-            </div>
-          </Provider>
+            </>
         )
       
       
