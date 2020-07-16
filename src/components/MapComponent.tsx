@@ -1,7 +1,9 @@
 import * as React from "react";
+import withStaticProps from "./withStaticProps";
+import SelectedMarker from "./SelectedMarker";
+import AddNoteModal from "./AddNoteModal";
 
-import {Title, Description, AddButton, CancelButton, ModalBox} from './styled'
-
+import {noteInterface, notesState} from './typescriptInterfaces'
 
 import {
   withScriptjs,
@@ -11,85 +13,69 @@ import {
   InfoWindow,
 } from "react-google-maps";
 
-export const MapComponent = withScriptjs(
-  withGoogleMap(({googleMapURL,
-  loadingElement,
-  containerElement,
-  mapElement,
+interface mapComponentProps {
+  onMapsClick(event: any): any;
+  notes: notesState["notes"];
+  selectedMarker: noteInterface;
+  setSelectedMarker(marker: noteInterface): any;
+  addNoteModal: boolean;
+  setAddNoteModal(value: boolean): any;
+  lat: number;
+  lng: number;
+  title: string;
+  description: string;
+  updateNote(event: any): any;
+  handleModalButtonClick(event: any): any;
+}
+
+const MapComponent = ({
   onMapsClick,
   notes,
   selectedMarker,
   setSelectedMarker,
   addNoteModal,
   setAddNoteModal,
-  lat=31.796,
-  lng=74.0159,
-  note,
+  lat = 31.796,
+  lng = 74.0159,
+  title,
   description,
   updateNote,
-  handleModalButtonClick}:any) => (
-    <GoogleMap
-      defaultZoom={10}
-      defaultCenter={{ lat: lat, lng: lng }}
-      onClick={onMapsClick}
-    >
-      {notes.map((note: any) => (
-        <Marker
-          onClick={() => {
-            setSelectedMarker(note);
-          }}
-          position={{ lat: note.lat, lng: note.lng }}
-        />
-      ))}
+  handleModalButtonClick,
+}: mapComponentProps) => (
+  <GoogleMap
+    defaultZoom={10}
+    defaultCenter={{ lat: lat, lng: lng }}
+    onClick={onMapsClick}
+  >
+    {notes.map((note: any, key: any) => (
+      <Marker
+        key={key}
+        onClick={() => {
+          setSelectedMarker(note);
+        }}
+        position={{ lat: note.lat, lng: note.lng }}
+      />
+    ))}
 
-      {selectedMarker && (
-        <InfoWindow
-          onCloseClick={() => {
-            setSelectedMarker(null);
-          }}
-          position={{
-            lat: selectedMarker.lat,
-            lng: selectedMarker.lng,
-          }}
-    
-        >
-           <div>
-               
-               <h3>Title</h3>
-               {selectedMarker.title}
-               <h3>Description</h3>
-               {selectedMarker.description}
-            </div> 
-        </InfoWindow>
-      )}
-
+    {selectedMarker && (
+      <SelectedMarker
+        selectedMarker={selectedMarker}
+        setSelectedMarker={setSelectedMarker}
+      ></SelectedMarker>
+    )}
 
     {addNoteModal && (
-        <InfoWindow
-          onCloseClick={() => {
-            setAddNoteModal(null);
-          }}
-          position={{
-            lat: lat,
-            lng: lng,
-          }}
-    
-        >
-           <ModalBox>
-                <h3 >Title</h3>
-               <Title id="title" value={note} onChange={updateNote}></Title>
-               <h3 >Description</h3>
-               <Description id="description" value={description} onChange={updateNote}></Description>
-               <AddButton id="add" onClick={handleModalButtonClick}>Add Note</AddButton>
-               <CancelButton  id="cancel" onClick={handleModalButtonClick}>Cancel</CancelButton>
-            </ModalBox> 
-        </InfoWindow>
-      )}
-
-        
-
-
-
-    </GoogleMap>
-  ))
+      <AddNoteModal
+        setAddNoteModal={setAddNoteModal}
+        lat={lat}
+        lng={lng}
+        title={title}
+        updateNote={updateNote}
+        description={description}
+        handleModalButtonClick={handleModalButtonClick}
+      ></AddNoteModal>
+    )}
+  </GoogleMap>
 );
+
+export default withStaticProps(withScriptjs(withGoogleMap(MapComponent)));
