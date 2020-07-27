@@ -2,49 +2,32 @@ import * as React from "react";
 import withStaticProps from "./withStaticProps";
 import SelectedMarker from "./SelectedMarker";
 import AddNoteModal from "./AddNoteModal";
-
-import {noteInterface, notesState} from './typescriptInterfaces'
+import { MapComponentProps } from "./typescriptInterfaces";
+import { compose, pipe } from "ramda";
 
 import {
   withScriptjs,
   withGoogleMap,
   GoogleMap,
   Marker,
-  InfoWindow,
 } from "react-google-maps";
-
-interface mapComponentProps {
-  onMapsClick(event: any): any;
-  notes: notesState["notes"];
-  selectedMarker: noteInterface;
-  setSelectedMarker(marker: noteInterface): any;
-  addNoteModal: boolean;
-  setAddNoteModal(value: boolean): any;
-  lat: number;
-  lng: number;
-  title: string;
-  description: string;
-  updateNote(event: any): any;
-  handleModalButtonClick(event: any): any;
-}
 
 const MapComponent = ({
   onMapsClick,
   notes,
   selectedMarker,
   setSelectedMarker,
-  addNoteModal,
-  setAddNoteModal,
-  lat = 31.796,
-  lng = 74.0159,
+  showModal,
+  lat,
+  lng,
   title,
   description,
   updateNote,
   handleModalButtonClick,
-}: mapComponentProps) => (
+}: MapComponentProps) => (
   <GoogleMap
-    defaultZoom={10}
-    defaultCenter={{ lat: lat, lng: lng }}
+    defaultZoom={8}
+    center={{ lat: Math.round(lat), lng: Math.round(lng) }}
     onClick={onMapsClick}
   >
     {notes.map((note: any, key: any) => (
@@ -64,9 +47,8 @@ const MapComponent = ({
       ></SelectedMarker>
     )}
 
-    {addNoteModal && (
+    {showModal && (
       <AddNoteModal
-        setAddNoteModal={setAddNoteModal}
         lat={lat}
         lng={lng}
         title={title}
@@ -78,4 +60,10 @@ const MapComponent = ({
   </GoogleMap>
 );
 
-export default withStaticProps(withScriptjs(withGoogleMap(MapComponent)));
+const WrappedMapComponent = compose(
+  withStaticProps,
+  withScriptjs,
+  withGoogleMap
+);
+
+export default WrappedMapComponent(MapComponent);

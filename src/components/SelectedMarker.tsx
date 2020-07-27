@@ -1,18 +1,11 @@
 import * as React from "react";
 
-import {
-    InfoWindow
-  } from "react-google-maps";
+import { InfoWindow } from "react-google-maps";
 
 class SelectedMarker extends React.Component<any> {
 
-    constructor(props:any){
-        super(props)
-    }
-    
   render() {
-
-    const {setSelectedMarker, selectedMarker} = this.props
+    const { setSelectedMarker, selectedMarker } = this.props;
 
     return (
       <InfoWindow
@@ -35,4 +28,4 @@ class SelectedMarker extends React.Component<any> {
   }
 }
 
-export default SelectedMarker
+export default SelectedMarker;

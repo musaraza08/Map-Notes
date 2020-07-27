@@ -1,4 +1,8 @@
 import * as React from "react";
+import { connect} from "react-redux";
+
+import {AddNoteModalProps } from "./typescriptInterfaces";
+import {toggleModal } from "../redux";
 
 import {
   Title,
@@ -10,24 +14,11 @@ import {
 
 import { InfoWindow } from "react-google-maps";
 
-interface AddNoteModalProps {
-  setAddNoteModal(set: boolean): any;
-  lat: number;
-  lng: number;
-  title: string;
-  updateNote(obj: any): any;
-  description: string;
-  handleModalButtonClick(e: object): any;
-}
-
 class AddNoteModal extends React.Component<AddNoteModalProps, {}> {
-  constructor(props: AddNoteModalProps) {
-    super(props);
-  }
+  
 
   render() {
     const {
-      setAddNoteModal,
       lat,
       lng,
       title,
@@ -39,7 +30,7 @@ class AddNoteModal extends React.Component<AddNoteModalProps, {}> {
     return (
       <InfoWindow
         onCloseClick={() => {
-          setAddNoteModal(null);
+          this.props.toggleModal;
         }}
         position={{
           lat: lat,
@@ -67,4 +58,13 @@ class AddNoteModal extends React.Component<AddNoteModalProps, {}> {
   }
 }
 
-export default AddNoteModal;
+const mapStateToProps = (state:any) => ({
+  showModal: state.showModal
+})
+
+const mapDispatchToProps = (dispatch:any) => ({
+  toggleModal: toggleModal
+})
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(AddNoteModal);

@@ -1,73 +1,118 @@
 import * as React from "react";
-
+import { MouseEvent } from "react";
+import { ifElse, equals} from "ramda";
 import { useDispatch, useSelector } from "react-redux";
 
-import { addNote as addNoteAction } from "../redux";
-import { noteSelector } from "../redux/notes/noteSelectors";
+import { GoogleMapProps} from "react-google-maps";
+
+import {
+  addNote,
+  requestApiData,
+  setLatLng,
+  toggleModal,
+} from "../redux";
+import {
+  noteSelector,
+  latLngSelector,
+  modalSelector,
+} from "../redux/notes/noteSelectors";
 
 import MapComponent from "./MapComponent";
 
-import {noteInterface, notesState} from './typescriptInterfaces'
+import { NotesState } from "./typescriptInterfaces";
+
+const useMapsState = (value: string) => {
+
+  if (value == "title"){
+    const [title, setTitle] = React.useState("");
+    return {title: title, setTitle: setTitle}
+  }
+  if (value == "description"){
+    const [description, setDescription] = React.useState("");
+    return {description: description, setDescription: setDescription}
+  }
+  if (value == "selectedMarker"){
+    const [selectedMarker, setSelectedMarker] = React.useState("");
+    return {selectedMarker: selectedMarker, setSelectedMarker: setSelectedMarker}
+  }
+}
 
 const Maps: React.FC<{}> = () => {
-  const [title, setTitle] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [lat, setLat] = React.useState(31.796);
-  const [lng, setLng] = React.useState(74.0159);
-  const [selectedMarker, setSelectedMarker] = React.useState(false);
-  const [addNoteModal, setAddNoteModal] = React.useState(false);
 
-  const updateNote = (event:any) => {
-    if (event.target.id == "title") {
-      setTitle(event.target.value);
-    } else {
-      setDescription(event.target.value);
-    }
-  };
+  const titleState = useMapsState("title")
+  const descriptionState = useMapsState("description")
+  const {selectedMarker, setSelectedMarker} = useMapsState("selectedMarker")
+
+  const notes = useSelector<NotesState, NotesState["notes"]>(noteSelector);
+  const latLng = useSelector<NotesState, NotesState["latLng"]>(latLngSelector);
+  const showModal = useSelector<NotesState, NotesState["showModal"]>(modalSelector);
 
   const dispatch = useDispatch();
 
-  const addNote = (note: noteInterface) => dispatch(addNoteAction(note));
+  React.useEffect(function () {
 
-  const notes = useSelector<notesState, notesState["notes"]>(noteSelector);
+    dispatch(requestApiData());
 
-  const onMapsClick = (e: any) => {
-    setLat(e.latLng.lat);
-    setLng(e.latLng.lng);
-    setAddNoteModal(true);
+  }, []);
+
+  const updateNote = (event: any) => {
+
+    const checkUpdateType = ifElse(
+      (type: string) => equals(type, "title"),
+      () => {titleState.setTitle(event.target.value)},
+      () => {descriptionState.setDescription(event.target.value)}
+    )
+
+    checkUpdateType(event.target.id)
+
   };
 
-  const handleModalButtonClick = (e: any) => {
-    if (e.target.id == "add") {
-      const note_payload = {
-        title: title,
-        description: description,
-        lat: lat,
-        lng: lng,
-      };
-      addNote(note_payload);
-    }
+  const onMapsClick: GoogleMapProps["onClick"] = (e) => {
+    dispatch(setLatLng({ lat: e.latLng.lat(), lng: e.latLng.lng() }));
+    dispatch(toggleModal());
+  };
 
-    setTitle("");
-    setDescription("");
-    setAddNoteModal(null);
+  const handleModalButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+
+    const checkButtonType = ifElse(
+      (buttonType: string) => equals(buttonType, "add"),
+      () => {
+        const note_payload = {
+          _id: 0,
+          title: titleState.title,
+          description: descriptionState.description,
+          lat: latLng.lat,
+          lng: latLng.lng,
+        };
+        dispatch(addNote(note_payload));
+      },
+      () => {
+        dispatch(toggleModal());
+      }
+    );
+
+    checkButtonType(e.currentTarget.id);
+
+    titleState.setTitle("");
+    descriptionState.setDescription("");
   };
 
   return (
-    <MapComponent
-      onMapsClick={onMapsClick}
-      notes={notes}
-      selectedMarker={selectedMarker}
-      setSelectedMarker={setSelectedMarker}
-      addNoteModal={addNoteModal}
-      setAddNoteModal={setAddNoteModal}
-      lat={lat}
-      lng={lng}
-      title={title}
-      description={description}
-      updateNote={updateNote}
-      handleModalButtonClick={handleModalButtonClick}
-    />
+    <div>
+      <MapComponent
+        onMapsClick={onMapsClick}
+        notes={notes}
+        selectedMarker={selectedMarker}
+        setSelectedMarker={setSelectedMarker}
+        showModal={showModal}
+        lat={latLng.lat}
+        lng={latLng.lng}
+        title={titleState.title}
+        description={descriptionState.description}
+        updateNote={updateNote}
+        handleModalButtonClick={handleModalButtonClick}
+      />
+    </div>
   );
 };
 

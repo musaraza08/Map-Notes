@@ -1,3 +1,3 @@
-export {addNote} from './notes/noteActions'
+export {addNote,recieveApiData, requestApiData, setLatLng, toggleModal } from './notes/noteActions'
 
 

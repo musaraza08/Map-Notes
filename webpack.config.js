@@ -17,7 +17,7 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
-        loader: "awesome-typescript-loader",
+        loader: "awesome-typescript-loader"
       },
       {
         enforce: "pre",
@@ -26,7 +26,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: "css-loader",
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
     ],
   },
@@ -35,7 +35,7 @@ module.exports = {
       template: path.resolve(__dirname, "src", "components", "index.html"),
     }),
     new MiniCssExtractPlugin({
-      filename: "./src/yourfile.css",
+      filename: './node_modules/react-notifications/lib/notifications.css',
     }),
   ],
 };
